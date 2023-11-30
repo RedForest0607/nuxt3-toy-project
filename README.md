@@ -6,11 +6,10 @@ Nuxt 환경에서 여러 모듈, 라이브러리, 개발환경 세팅 테스트�
 상태 관리 라이브러리
 2. Vite  
 빌드 툴
-3. Quasar  
+3. Tailwind CSS  
 UI 프레임 워크, Material Design을 기반으로 하는 UI 프레임 워크이며, Vuetify 만큼이나 vue 생태계에서 널리쓰이는 프레임워크다.
 4. PrismaORM  
 데이터 연결을 위한 ORM
-
 5. Eslint  
 정적 코드 분석기 입니다. 코드에 내재되어 있는 문제점에 대해서 미리 알 수 있다.
 6. Prettier  
