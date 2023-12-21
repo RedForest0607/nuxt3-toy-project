@@ -1,5 +1,7 @@
-import { type Cart } from '~/pages/shopping-cart/types/Cart';
-import { type Product } from '~/pages/product/types/Product';
+import { defineStore } from 'pinia';
+import { reactive } from 'vue';
+import { type Cart } from '~/types/Cart';
+import { type Product } from '~/types/Product';
 
 const productSampleInfo: Product = {
     productId: '12356',
@@ -14,7 +16,7 @@ const productSampleInfo2: Product = {
     stock: 5,
 };
 
-export const useProductStore = defineStore('product', () => {
+export const useShoppingCartStore = defineStore('shopping-cart', () => {
     const cartSampleInfo: Cart = reactive({
         cartId: '12345',
         userId: '67890',
@@ -45,7 +47,7 @@ export const useProductStore = defineStore('product', () => {
         cartSampleInfo.cartList = cartSampleInfo.cartList.filter(item => item.product.productId !== productId);
     }
 
-    function getCheckedItem() {
+    function getCheckedItemIds() {
         const checkedItem: Set<string> = new Set<string>();
 
         for (const cartItem of cartSampleInfo.cartList) {
@@ -60,5 +62,26 @@ export const useProductStore = defineStore('product', () => {
     function getNumberOfCartItem(): number {
         return cartSampleInfo.cartList.length;
     }
-    return { cartSampleInfo, modifyIsChecked, getNumberOfCartItem, deleteItem, getTotalPrice, getCheckedItem };
+
+    function changeCartItemQty(productId: string, qty: number) {
+        const cartItem = cartSampleInfo.cartList.find(item => item.product.productId === productId);
+        if (cartItem) {
+            cartItem.amount = qty;
+        }
+    }
+
+    async function addProduct(productId: string, qty: number) {
+        const cartItem = cartSampleInfo.cartList.find(item => item.product.productId === productId);
+        if (cartItem) {
+            cartItem.amount = cartItem.amount + qty;
+        } else if (!cartItem) {
+            const product = await useFetch(() => `/api/product/${productId}`, {
+                method: 'get',
+            });
+            if (product.data.value != null) {
+                cartSampleInfo.cartList.push({ product: toRaw(product.data.value), amount: qty, isChecked: true });
+            }
+        }
+    }
+    return { cartSampleInfo, modifyIsChecked, getNumberOfCartItem, deleteItem, getTotalPrice, getCheckedItemIds, changeCartItemQty, addProduct };
 });

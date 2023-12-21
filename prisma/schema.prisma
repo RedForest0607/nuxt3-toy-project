@@ -1,0 +1,25 @@
+datasource test_db {
+  url      = env("DB_ADDRESS")
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model product {
+  productId    String @id @unique @map("product_id")
+  productPrice Int    @map("product_price")
+  stock        Int
+  productName  String @map("product_name")
+  cart         cart[]
+}
+
+model cart {
+  id        String   @id @unique
+  cartId    String   @map("cart_id")
+  amount    Int
+  isChecked Boolean  @map("is_checked")
+  product   product? @relation(fields: [productId], references: [productId])
+  productId String?  @map("product_id")
+}

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Ref, UnwrapRef } from 'vue';
-import { useProductStore } from '~/stores/productStore';
+import { useShoppingCartStore } from '~/stores/shoppingCartStore';
 
-const store = useProductStore();
+const store = useShoppingCartStore();
 const numberOfCartItem: Ref<UnwrapRef<number>> = ref(store.getNumberOfCartItem());
 
 watch(store, store => {

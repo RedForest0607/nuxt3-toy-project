@@ -1,27 +1,37 @@
 <script setup lang="ts">
-import { useProductStore } from '~/stores/productStore';
+import { useShoppingCartStore } from '~/stores/shoppingCartStore';
 
-const totalPrice = reactive({ value: 0 });
-const store = useProductStore();
-const checkedItemList = reactive(store.getCheckedItem());
+const totalPrice = ref(0);
+const store = useShoppingCartStore();
+const checkedItemList = reactive(store.getCheckedItemIds());
 const { cartSampleInfo } = storeToRefs(store);
 
-function modifyCheckedList(event: any) {
-    store.modifyIsChecked(event.target.id);
-    checkedItemList.has(event.target.id) ? checkedItemList.delete(event.target.id) : checkedItemList.add(event.target.id);
-}
-
 watch(checkedItemList, () => {
-    totalPrice.value = store.getTotalPrice();
+    setTotalPrice();
 });
 
 onMounted(() => {
-    store.getCheckedItem();
-    totalPrice.value = store.getTotalPrice();
+    store.getCheckedItemIds();
+    setTotalPrice();
 });
+
+function modifyCheckedList(e: any) {
+    store.modifyIsChecked(e.target.id);
+    checkedItemList.has(e.target.id) ? checkedItemList.delete(e.target.id) : checkedItemList.add(e.target.id);
+}
 
 function deleteItem(productId: string) {
     store.deleteItem(productId);
+    setTotalPrice();
+}
+
+function changeCartItemQty(productId: string, e: any) {
+    store.changeCartItemQty(productId, e.target.value);
+    setTotalPrice();
+}
+
+function setTotalPrice() {
+    totalPrice.value = store.getTotalPrice();
 }
 </script>
 
@@ -72,7 +82,13 @@ function deleteItem(productId: string) {
                         </div>
                     </td>
                     <td>
-                        <span class="badge badge-ghost badge-sm">{{ product.amount }}</span>
+                        <input
+                            class="badge badge-ghost badge-sm w-10 h-10"
+                            type="number"
+                            min="0"
+                            :value="product.amount"
+                            @change="changeCartItemQty(product.product.productId, $event)"
+                        />
                     </td>
                     <td>{{ product.product.productPrice }} 원</td>
                     <th id="delete button">
@@ -86,7 +102,7 @@ function deleteItem(productId: string) {
                     <th id="blank"></th>
                     <th id="price">가격</th>
                     <th id="blank"></th>
-                    <th id="totalPrice" class="price">{{ totalPrice.value }} 원</th>
+                    <th id="totalPrice" class="price">{{ totalPrice.toString() }} 원</th>
                     <th id="blank"></th>
                 </tr>
             </tfoot>
@@ -98,5 +114,8 @@ function deleteItem(productId: string) {
 .price {
     font-size: 20px;
     color: white;
+}
+input {
+    text-align: right;
 }
 </style>
